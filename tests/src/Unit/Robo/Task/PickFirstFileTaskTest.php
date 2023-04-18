@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Robo\Task;
 
@@ -13,11 +13,15 @@ use Symfony\Component\ErrorHandler\BufferingLogger;
  * @group marvin
  * @group robo-task
  *
- * @covers \Drupal\marvin\Robo\Task\PickFirstFileTask<extended>
+ * @covers \Drupal\marvin\Robo\Task\PickFirstFileTask
+ * @covers \Drupal\marvin\Robo\Task\BaseTask
  * @covers \Drupal\marvin\Robo\PickFirstFileTaskLoader
  */
 class PickFirstFileTaskTest extends TaskTestBase {
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesRunSuccess(): array {
     $rootDir = $this->getRootDir('testRunSuccess');
 
@@ -109,6 +113,11 @@ class PickFirstFileTaskTest extends TaskTestBase {
 
   /**
    * @dataProvider casesRunSuccess
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $options
+   * @phpstan-param array<string, mixed> $stateData
+   * @phpstan-param array<string, mixed> $vfsStructure
    */
   public function testRunSuccess(array $expected, array $options, array $stateData, array $vfsStructure): void {
     vfsStream::setup($this->getRootDir(), NULL, $vfsStructure);

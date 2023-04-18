@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Integration;
 
@@ -10,11 +10,15 @@ use Drupal\marvin\RfcLogLevel;
  * @group marvin
  * @group drush-command
  *
- * @covers \Drush\Commands\marvin\StatusReportCommands<extended>
+ * @covers \Drush\Commands\marvin\StatusReportCommands
+ * @covers \Drush\Commands\marvin\CommandsBase
  * @covers \Drupal\marvin\CommandDelegatorTrait
  */
 class StatusReportCommandsTest extends UnishIntegrationTestCase {
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public static function casesMarvinStatusReport(): array {
     return [
       'info' => [
@@ -65,6 +69,9 @@ class StatusReportCommandsTest extends UnishIntegrationTestCase {
 
   /**
    * @dataProvider casesMarvinStatusReport
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $options
    */
   public function testMarvinStatusReport(array $expected, int $severity, array $options = []): void {
     $expected += [

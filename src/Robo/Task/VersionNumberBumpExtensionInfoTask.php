@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\Robo\Task;
 
 use Drupal\marvin\Utils;
-use Stringy\StaticStringy;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\String\UnicodeString;
 
 class VersionNumberBumpExtensionInfoTask extends BaseTask {
 
@@ -74,6 +74,9 @@ class VersionNumberBumpExtensionInfoTask extends BaseTask {
     return $this;
   }
 
+  /**
+   * @phpstan-param marvin-robo-task-version-number-bump-extension-info-options $options
+   */
   public function setOptions(array $options): static {
     parent::setOptions($options);
 
@@ -261,13 +264,18 @@ class VersionNumberBumpExtensionInfoTask extends BaseTask {
       $logContext
     );
 
-    $composerInfo = json_decode(file_get_contents($composerJsonFilePath), TRUE);
+    $composerInfo = json_decode(
+      file_get_contents($composerJsonFilePath) ?: '{}',
+      TRUE,
+    );
     $composerInfo['version'] = $versionNumber;
 
-    $jsonString = json_encode($composerInfo, \JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT);
+    $jsonString = json_encode($composerInfo, \JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT) ?: '{}';
     $this->fs->dumpFile(
       $composerJsonFilePath,
-      StaticStringy::ensureRight($jsonString, "\n")
+      (new UnicodeString($jsonString))
+        ->ensureEnd("\n")
+        ->toString(),
     );
 
     return $this;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Robo\Task;
 
@@ -12,11 +12,15 @@ use Symfony\Component\Finder\SplFileInfo;
  * @group marvin
  * @group robo-task
  *
- * @covers \Drupal\marvin\Robo\Task\CopyFilesTask<extended>
+ * @covers \Drupal\marvin\Robo\Task\CopyFilesTask
+ * @covers \Drupal\marvin\Robo\Task\BaseTask
  * @covers \Drupal\marvin\Robo\CopyFilesTaskLoader
  */
 class CopyFilesTaskTest extends TaskTestBase {
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesRunSuccess(): array {
     $fileContent = 'a';
 
@@ -107,9 +111,13 @@ class CopyFilesTaskTest extends TaskTestBase {
 
   /**
    * @dataProvider casesRunSuccess
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $vfsStructure
+   * @phpstan-param array<string, mixed> $options
    */
-  public function testRunSuccess(array $expected, array $structure, array $options): void {
-    $vfs = vfsStream::setup(__FUNCTION__, NULL, $structure);
+  public function testRunSuccess(array $expected, array $vfsStructure, array $options): void {
+    $vfs = vfsStream::setup(__FUNCTION__, NULL, $vfsStructure);
     $rootDir = $vfs->url();
     if (!empty($options['srcDir'])) {
       $options['srcDir'] = $rootDir . '/' . $options['srcDir'];
@@ -129,10 +137,9 @@ class CopyFilesTaskTest extends TaskTestBase {
 
     $task = $this
       ->taskBuilder
-      ->taskMarvinCopyFiles($options)
-      ->setContainer($this->container);
+      ->taskMarvinCopyFiles($options);
+    $task->setContainer($this->container);
 
-    /** @var \Robo\Result $result */
     $result = $task->run();
 
     if (array_key_exists('exitCode', $expected)) {
@@ -164,7 +171,7 @@ class CopyFilesTaskTest extends TaskTestBase {
         static::assertSame(
           $exists,
           file_exists($fileNameAbsolute),
-          sprintf('file exists: %s; file name: "%s";', var_export($exists), $fileNameAbsolute)
+          sprintf('file exists: %s; file name: "%s";', var_export($exists, TRUE), $fileNameAbsolute)
         );
       }
     }

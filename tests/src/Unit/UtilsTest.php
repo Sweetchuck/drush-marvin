@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit;
 
@@ -17,7 +17,7 @@ use Symfony\Component\Filesystem\Path;
 /**
  * @group marvin
  *
- * @covers \Drupal\marvin\Utils<extended>
+ * @covers \Drupal\marvin\Utils
  */
 class UtilsTest extends TestCase {
 
@@ -30,6 +30,9 @@ class UtilsTest extends TestCase {
     putenv('COMPOSER');
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesIsDrupalPackage(): array {
     return [
       'module' => [TRUE, ['type' => 'drupal-module']],
@@ -43,6 +46,8 @@ class UtilsTest extends TestCase {
 
   /**
    * @dataProvider casesIsDrupalPackage
+   *
+   * @phpstan-param marvin-composer-info $package
    */
   public function testIsDrupalPackage(bool $expected, array $package): void {
     static::assertSame($expected, Utils::isDrupalPackage($package));
@@ -58,6 +63,9 @@ class UtilsTest extends TestCase {
     static::assertSame('foo.json', Utils::getComposerJsonFileName());
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesIsValidDrupalExtensionVersionNumber(): array {
     return [
       '8.x-1.0' => [TRUE, '8.x-1.0'],
@@ -71,6 +79,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, Utils::isValidDrupalExtensionVersionNumber($versionNumber));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesDrupalPhpExtensionPatterns(): array {
     return [
       'basic' => [
@@ -89,41 +100,13 @@ class UtilsTest extends TestCase {
   /**
    * @dataProvider casesDrupalPhpExtensionPatterns
    */
-  public function testDrupalPhpExtensionPatterns(array $expected): void {
+  public function testDrupalPhpExtensionPatterns(mixed $expected): void {
     static::assertSame($expected, Utils::drupalPhpExtensionPatterns());
   }
 
-  public function casesCommandClassNameToConfigIdentifier(): array {
-    return [
-      'with leading backslash - Lint*' => [
-        'marvin.lint.phpcs',
-        '\Drush\Commands\Marvin\Lint\LintPhpcsCommands',
-      ],
-      'without leading backslash - Lint*' => [
-        'marvin.lint.phpcs',
-        'Drush\Commands\Marvin\Lint\LintPhpcsCommands',
-      ],
-      'without leading backslash - Phpunit' => [
-        'marvin.test.phpunit',
-        'Drush\Commands\Marvin\Test\PhpunitCommands',
-      ],
-      'multi word - FooBar' => [
-        'marvin.foo-bar',
-        'Drush\Commands\Marvin\FooBarCommands',
-      ],
-    ];
-  }
-
   /**
-   * @dataProvider casesCommandClassNameToConfigIdentifier
+   * @phpstan-return array<string, mixed>
    */
-  public function testCommandClassNameToConfigIdentifier(string $expected, string $className): void {
-    static::assertSame(
-      $expected,
-      Utils::commandClassNameToConfigIdentifier($className)
-    );
-  }
-
   public function casesFindFileUpward(): array {
     return [
       'not-exists' => [
@@ -190,14 +173,19 @@ class UtilsTest extends TestCase {
 
   /**
    * @dataProvider casesFindFileUpward
+   *
+   * @phpstan-param array<string, mixed> $vfsStructure
    */
-  public function testFindFileUpward($expected, string $fileName, string $relativeDirectory, array $vfsStructure): void {
+  public function testFindFileUpward(mixed $expected, string $fileName, string $relativeDirectory, array $vfsStructure): void {
     $vfs = vfsStream::setup(__FUNCTION__, NULL, $vfsStructure);
     $absoluteDirectory = Path::join($vfs->url(), $relativeDirectory);
 
     static::assertSame($expected, Utils::findFileUpward($fileName, $absoluteDirectory));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesGetDirectDescendantDrupalPhpFiles(): array {
     return [
       'empty' => [
@@ -232,17 +220,22 @@ class UtilsTest extends TestCase {
 
   /**
    * @dataProvider casesGetDirectDescendantDrupalPhpFiles
+   *
+   * @phpstan-param array<string, mixed> $vfsStructure
    */
-  public function testGetDirectDescendantDrupalPhpFiles(array $expected, string $relativeDirectory, array $vfsStructure): void {
+  public function testGetDirectDescendantDrupalPhpFiles(mixed $expected, string $relativeDirectory, array $vfsStructure): void {
     $vfs = vfsStream::setup(__FUNCTION__, NULL, $vfsStructure);
     $absoluteDirectory = Path::join($vfs->url(), $relativeDirectory);
 
     static::assertSame(
       $expected,
-      Utils::getDirectDescendantDrupalPhpFiles($absoluteDirectory)
+      Utils::getDirectDescendantDrupalPhpFiles($absoluteDirectory),
     );
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesEscapeYamlValueString(): array {
     return [
       'basic' => ["' foo bar '", ' foo bar '],
@@ -256,6 +249,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, Utils::escapeYamlValueString($text));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesChangeVersionNumberInYaml(): array {
     return [
       'first' => [
@@ -373,6 +369,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, Utils::changeVersionNumberInYaml($yamlString, $versionNumber));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesEnsureTrailingEol(): array {
     return [
       'missing' => ['a' . PHP_EOL, 'a'],
@@ -388,6 +387,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, $text);
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesPhpUnitSuiteNameToNamespace(): array {
     return [
       'unit' => ['Unit', 'unit'],
@@ -403,10 +405,13 @@ class UtilsTest extends TestCase {
   /**
    * @dataProvider casesPhpUnitSuiteNameToNamespace
    */
-  public function testPhpUnitSuiteNameToNamespace($expected, string $suiteName): void {
+  public function testPhpUnitSuiteNameToNamespace(mixed $expected, string $suiteName): void {
     static::assertSame($expected, Utils::phpUnitSuiteNameToNamespace($suiteName));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesAggregateCommandErrors(): array {
     return [
       'empty' => [
@@ -429,6 +434,9 @@ class UtilsTest extends TestCase {
 
   /**
    * @dataProvider casesAggregateCommandErrors
+   *
+   * @phpstan-param null|array{exitCode: string, outputData: string} $expected
+   * @phpstan-param \Consolidation\AnnotatedCommand\CommandError[] $commandErrors
    */
   public function testAggregateCommandErrors(?array $expected, array $commandErrors): void {
     $commandError = Utils::aggregateCommandErrors($commandErrors);
@@ -484,6 +492,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, $actualRowsOfFields->getArrayCopy());
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesFormatTextBySeverity(): array {
     return [
       'warning' => ['<fg=yellow>a</>', RfcLogLevel::WARNING, 'a'],
@@ -499,6 +510,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, Utils::formatTextBySeverity($severity, $text));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesParseDrupalExtensionVersionNumber(): array {
     return [
       'minimum' => [
@@ -551,7 +565,7 @@ class UtilsTest extends TestCase {
   /**
    * @dataProvider casesParseDrupalExtensionVersionNumber
    */
-  public function testParseDrupalExtensionVersionNumber($expected, $versionNumber): void {
+  public function testParseDrupalExtensionVersionNumber(mixed $expected, string $versionNumber): void {
     static::assertSame($expected, Utils::parseDrupalExtensionVersionNumber($versionNumber));
   }
 
@@ -562,6 +576,9 @@ class UtilsTest extends TestCase {
     Utils::parseDrupalExtensionVersionNumber('invalid');
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesDbUrl(): array {
     return [
       'sqlite - basic' => [
@@ -646,11 +663,16 @@ class UtilsTest extends TestCase {
 
   /**
    * @dataProvider casesDbUrl
+   *
+   * @phpstan-param marvin-db-connection $connection
    */
-  public function testDbUrl($expected, array $connection): void {
+  public function testDbUrl(mixed $expected, array $connection): void {
     static::assertSame($expected, Utils::dbUrl($connection));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesSplitPackageName(): array {
     return [
       'basic' => [
@@ -673,10 +695,13 @@ class UtilsTest extends TestCase {
   /**
    * @dataProvider casesSplitPackageName
    */
-  public function testSplitPackageName($expected, string $packageName): void {
+  public function testSplitPackageName(mixed $expected, string $packageName): void {
     static::assertSame($expected, Utils::splitPackageName($packageName));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesPhpVersionToPhpVersionId(): array {
     return [
       'empty' => ['', ''],
@@ -693,6 +718,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, Utils::phpVersionToPhpVersionId($phpVersion));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesPhpErrorAll(): array {
     // E_ALL is same for PHP 7.1, 7.2 and 7.3.
     $eAll = 32767;
@@ -711,10 +739,13 @@ class UtilsTest extends TestCase {
   /**
    * @dataProvider casesPhpErrorAll
    */
-  public function testPhpErrorAll(int $expected, string $phpVersion) {
+  public function testPhpErrorAll(int $expected, string $phpVersion): void {
     static::assertSame($expected, Utils::phpErrorAll($phpVersion));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesDetectDrupalRootDir(): array {
     return [
       'empty' => [
@@ -746,6 +777,8 @@ class UtilsTest extends TestCase {
 
   /**
    * @dataProvider casesDetectDrupalRootDir
+   *
+   * @phpstan-param array<string, mixed> $json
    */
   public function testDetectDrupalRootDir(string $expected, array $json): void {
     $vfsStructure = [
@@ -761,6 +794,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, $composerInfo->getDrupalRootDir());
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesSemverToDrupal(): array {
     return [
       'basic' => ['8.x-4.2', '8.x', '4.2.1'],
@@ -775,6 +811,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, Utils::semverToDrupal($core, $semver));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesDrupalToSemver(): array {
     return [
       'basic' => ['1.0.0', '8.x-1.0'],
@@ -791,6 +830,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, Utils::drupalToSemver($drupalVersion));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesIncrementSemVersion(): array {
     return [
       'major.basic' => ['2.0.0', '1.2.3', 'major'],
@@ -817,6 +859,9 @@ class UtilsTest extends TestCase {
     Utils::incrementSemVersion('1.2.3', 'not-exists');
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesPickFirstFile(): array {
     return [
       'empty' => [NULL, [], [], []],
@@ -868,6 +913,11 @@ class UtilsTest extends TestCase {
 
   /**
    * @dataProvider casesPickFirstFile
+   *
+   * @phpstan-param null|array<string, mixed> $expected
+   * @phpstan-param array<string> $dirs
+   * @phpstan-param array<string> $files
+   * @phpstan-param array<string, mixed> $vfsStructure
    */
   public function testPickFirstFile(?array $expected, array $dirs, array $files, array $vfsStructure): void {
     $vfs = vfsStream::setup(
@@ -889,6 +939,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, Utils::pickFirstFile($dirs, $files));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesGetTriStateCliOption(): array {
     return [
       'null' => ['', NULL, 'a'],
@@ -904,6 +957,9 @@ class UtilsTest extends TestCase {
     static::assertSame($expected, Utils::getTriStateCliOption($state, $optionName));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public static function casesGetExitCodeBasedOnSeverity(): array {
     return [
       'basic' => [0, RfcLogLevel::WARNING],
@@ -913,8 +969,10 @@ class UtilsTest extends TestCase {
 
   /**
    * @dataProvider casesGetExitCodeBasedOnSeverity
+   *
+   * @phpstan-param int<0, 7> ...$args
    */
-  public function testGetExitCodeBasedOnSeverity($expected, ?int ...$args): void {
+  public function testGetExitCodeBasedOnSeverity(mixed $expected, int ...$args): void {
     static::assertSame($expected, Utils::getExitCodeBasedOnSeverity(...$args));
   }
 

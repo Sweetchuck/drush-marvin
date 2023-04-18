@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drush\Commands\marvin;
 
 use Sweetchuck\LintReport\ReporterInterface;
-use Sweetchuck\Utils\Filter\ArrayFilterEnabled;
+use Sweetchuck\Utils\Filter\EnabledFilter;
 
 class LintCommandsBase extends CommandsBase {
 
@@ -31,11 +31,11 @@ class LintCommandsBase extends CommandsBase {
    * @return string[]
    */
   protected function getLintReporterConfigNamesByEnvironmentVariant(): array {
-    $reporterCombinations = $this
+    $reporterCombinations = (array) $this
       ->getConfig()
-      ->get('marvin.lint.reporterCombination', []);
+      ->get('marvin.lint.reporterCombination');
 
-    $filter = new ArrayFilterEnabled();
+    $filter = new EnabledFilter();
     foreach ($this->getEnvironmentVariants() as $environmentVariant) {
       if (isset($reporterCombinations[$environmentVariant])) {
         return array_keys(array_filter($reporterCombinations[$environmentVariant], $filter));
@@ -45,20 +45,27 @@ class LintCommandsBase extends CommandsBase {
     return [];
   }
 
+  /**
+   * @phpstan-return array<string, \Sweetchuck\LintReport\ReporterInterface>
+   */
   protected function getLintReporters(): array {
-    $lintReporterConfigs = $this->getConfig()->get('marvin.lint.reporterConfig', []);
+    $lintReporterConfigs = (array) $this
+      ->getConfig()
+      ->get('marvin.lint.reporterConfig');
     $lintReporterConfigNames = $this->getLintReporterConfigNamesByEnvironmentVariant();
 
     $selectedLintReporterConfigs = array_intersect_key(
       $lintReporterConfigs,
-      array_flip($lintReporterConfigNames)
+      array_flip($lintReporterConfigNames),
     );
 
     return $this->parseLintReporterConfigs($selectedLintReporterConfigs);
   }
 
   /**
-   * @return \Sweetchuck\LintReport\ReporterInterface[]
+   * @phpstan-param array<string, marvin-lint-reporter-config-base> $lintReporterConfigs
+   *
+   * @phpstan-return array<string, \Sweetchuck\LintReport\ReporterInterface>
    */
   protected function parseLintReporterConfigs(array $lintReporterConfigs): array {
     $reporters = [];
@@ -73,6 +80,9 @@ class LintCommandsBase extends CommandsBase {
     return $reporters;
   }
 
+  /**
+   * @phpstan-param marvin-lint-reporter-config-base $config
+   */
   protected function parseLintReporterConfig(array $config): ReporterInterface {
     $config['options']['basePath'] = $this->getProjectRootDir();
 

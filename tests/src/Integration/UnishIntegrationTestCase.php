@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Integration;
 
@@ -14,12 +14,18 @@ class UnishIntegrationTestCase extends ExistingSiteBase {
 
   protected string $projectName = 'project_01';
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   protected function getCommonCommandLineOptions(): array {
     return [
       'config' => Path::join($this->getDrupalRoot(), '..', 'drush'),
     ];
   }
 
+  /**
+   * @phpstan-return array<string, null|string>
+   */
   protected function getCommonCommandLineEnvVars(): array {
     return [
       'HOME' => '/dev/null',

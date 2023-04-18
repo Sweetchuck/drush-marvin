@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drush\Commands\marvin;
 
@@ -24,6 +24,11 @@ class NpmCommandsBase extends CommandsBase {
 
   protected string $customEventNamePrefix = 'marvin:npm';
 
+  /**
+   * @phpstan-param array<string, string> $packages
+   *   key: package name.
+   *   value: package path.
+   */
   protected function getTaskNpmInstallPackages(array $packages): CollectionBuilder {
     $cb = $this->collectionBuilder();
     foreach ($packages as $packageName => $packagePath) {
@@ -34,7 +39,7 @@ class NpmCommandsBase extends CommandsBase {
   }
 
   protected function getTaskNpmInstallPackage(string $packageName, string $packagePath): CollectionBuilder {
-    $packagePathRelative = Path::makeRelative($packagePath, getcwd());
+    $packagePathRelative = Path::makeRelative($packagePath, $this->getProjectRootDir());
     if ($packagePathRelative === '') {
       $packagePathRelative = '.';
     }

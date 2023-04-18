@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\StatusReport;
 
@@ -22,9 +22,16 @@ interface StatusReportEntryInterface extends \JsonSerializable {
 
   public function setDescription(string $description): static;
 
+  /**
+   * @phpstan-return marvin-rfc-log-level
+   *
+   * @see \Drupal\Core\Logger\RfcLogLevel::getLevels
+   */
   public function getSeverity(): int;
 
   /**
+   * @phpstan-param marvin-rfc-log-level $severity
+   *
    * @see \Drupal\Core\Logger\RfcLogLevel::getLevels
    */
   public function setSeverity(int $severity): static;

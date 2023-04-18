@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drush\Commands\marvin;
 
@@ -50,8 +50,14 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
 
   protected string $versionTagNamePattern = '/^(v){0,1}(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(|-(?P<special>[\da-zA-Z.]+))(|\+(?P<metadata>[\da-zA-Z.]+))$/';
 
+  /**
+   * @todo Maybe the $packageType is not enough information.
+   */
   abstract protected function isApplicable(string $projectType): bool;
 
+  /**
+   * @phpstan-return array<string, marvin-task-definition>
+   */
   protected function getBuildSteps(): array {
     $this->highestBuildStepWeight = -250;
 
@@ -107,6 +113,9 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
     ];
   }
 
+  /**
+   * @phpstan-return marvin-artifact-vanilla-state
+   */
   protected function getInitialStateData(): array {
     return [
       // @todo Auto detect core version.
@@ -119,7 +128,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    *
    * @todo Create native Robo task.
    */
@@ -132,7 +141,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    *
    * @todo Create native Robo task.
    */
@@ -169,7 +178,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    *
    * @todo Create native Robo task.
    */
@@ -209,7 +218,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    *
    * @todo Create native Robo task.
    */
@@ -229,7 +238,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    */
   protected function getTaskPrepareDirectory() {
     return $this
@@ -238,7 +247,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    */
   protected function getTaskCopyFilesCollect() {
     return $this
@@ -247,7 +256,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    */
   protected function getTaskCopyFiles() {
     return $this
@@ -258,7 +267,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    */
   protected function getTaskBumpVersionNumberRoot() {
     return $this
@@ -269,12 +278,12 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    */
   abstract protected function getTaskCollectChildExtensionDirs();
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    */
   protected function getTaskBumpVersionNumberExtensions(
     string $iterableStateKey,
@@ -310,7 +319,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    */
   protected function getTaskCleanupCollect() {
     return function (RoboStateData $data): int {
@@ -343,7 +352,7 @@ abstract class ArtifactBuildCommandsBase extends ArtifactCommandsBase {
   }
 
   /**
-   * @return callable|\Robo\Contract\TaskInterface
+   * @return \Closure|\Robo\Contract\TaskInterface
    */
   protected function getTaskCleanup() {
     return $this

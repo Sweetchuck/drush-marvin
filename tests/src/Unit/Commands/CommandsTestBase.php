@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Commands;
 
@@ -8,6 +8,7 @@ use Drupal\marvin\ComposerInfo;
 use Drupal\marvin\Utils;
 use Drush\Commands\marvin\CommandsBase;
 use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Sweetchuck\LintReport\Reporter\BaseReporter;
@@ -19,30 +20,21 @@ class CommandsTestBase extends TestCase {
     return Path::canonicalize(__DIR__ . '/../../../..');
   }
 
-  /**
-   * @var \org\bovigo\vfs\vfsStreamDirectory
-   */
-  protected $vfs;
+  protected vfsStreamDirectory $vfs;
 
   /**
-   * @var \Drupal\marvin\ComposerInfo
+   * @phpstan-var \Drupal\marvin\ComposerInfo<string, mixed>
    */
-  protected $composerInfo;
+  protected ComposerInfo $composerInfo;
+
+  protected string $marvinRootDir = '';
+
+  protected CommandsBase $commands;
 
   /**
-   * @var string
+   * @phpstan-var class-string<\Drush\Commands\marvin\CommandsBase>
    */
-  protected $marvinRootDir = '';
-
-  /**
-   * @var \Drush\Commands\marvin\CommandsBase
-   */
-  protected $commands;
-
-  /**
-   * @var string
-   */
-  protected $commandsClass = CommandsBase::class;
+  protected string $commandsClass = CommandsBase::class;
 
   protected function setUp(): void {
     parent::setUp();
@@ -53,10 +45,7 @@ class CommandsTestBase extends TestCase {
       ->setUpCommands();
   }
 
-  /**
-   * @return $this
-   */
-  protected function setUpVfs() {
+  protected function setUpVfs(): static {
     $this->vfs = vfsStream::setup(
       __FUNCTION__,
       NULL,
@@ -72,24 +61,21 @@ class CommandsTestBase extends TestCase {
     return $this;
   }
 
-  /**
-   * @return $this
-   */
-  protected function setUpComposerInfo() {
+  protected function setUpComposerInfo(): static {
     $this->composerInfo = ComposerInfo::create($this->vfs->url() . '/project_01');
 
     return $this;
   }
 
-  /**
-   * @return $this
-   */
-  protected function setUpCommands() {
+  protected function setUpCommands(): static {
     $this->commands = new $this->commandsClass($this->composerInfo);
 
     return $this;
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   protected function getDefaultConfigData(): array {
     return [
       'drush' => [
@@ -98,7 +84,7 @@ class CommandsTestBase extends TestCase {
     ];
   }
 
-  protected function initContainerLintReporters(ContainerInterface $container) {
+  protected function initContainerLintReporters(ContainerInterface $container): static {
     $lintServices = BaseReporter::getServices();
     foreach ($lintServices as $id => $class) {
       Utils::addDefinitionsToContainer(
@@ -111,6 +97,8 @@ class CommandsTestBase extends TestCase {
         $container,
       );
     }
+
+    return $this;
   }
 
 }

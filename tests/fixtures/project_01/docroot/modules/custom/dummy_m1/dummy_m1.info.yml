@@ -1,6 +1,0 @@
-name: 'Dummy M1'
-type: 'module'
-description: 'Dummy description'
-package: 'Dummy'
-version: '8.x-1.0'
-core: '8.x'

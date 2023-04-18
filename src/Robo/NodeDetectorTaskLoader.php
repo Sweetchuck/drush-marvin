@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\Robo;
 
@@ -11,6 +11,8 @@ trait NodeDetectorTaskLoader {
 
   /**
    * @return \Robo\Collection\CollectionBuilder|\Drupal\marvin\Robo\Task\NodeDetectorTask
+   *
+   * @phpstan-param marvin-robo-task-node-detector-options $options
    */
   protected function taskMarvinNodeDetector(array $options = []) {
     /** @var \Drupal\marvin\Robo\Task\NodeDetectorTask $task */

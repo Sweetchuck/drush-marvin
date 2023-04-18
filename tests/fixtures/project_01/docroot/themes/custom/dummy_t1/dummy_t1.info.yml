@@ -1,6 +1,0 @@
-name: 'Dummy T1'
-type: 'theme'
-description: 'Dummy description'
-package: 'Dummy'
-version: '8.x-1.0'
-core: '8.x'

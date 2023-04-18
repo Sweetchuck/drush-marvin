@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\Robo;
 
@@ -10,6 +10,8 @@ trait PrepareDirectoryTaskLoader {
 
   /**
    * @return \Robo\Collection\CollectionBuilder|\Drupal\marvin\Robo\Task\PrepareDirectoryTask
+   *
+   * @phpstan-param marvin-robo-task-perpare-directory-options $options
    */
   protected function taskMarvinPrepareDirectory(array $options = []) {
     /** @var \Drupal\marvin\Robo\Task\PrepareDirectoryTask $task */

@@ -1,0 +1,50 @@
+<phpunit
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/sebastianbergmann/phpunit/9.6/phpunit.xsd"
+  bootstrap="tests/bootstrap.php"
+  cacheResultFile=".cache/phpunit/result.json"
+  verbose="true"
+  colors="true">
+
+  <php>
+    <ini name="memory_limit" value="-1"/>
+    <ini name="error_reporting" value="32767"/>
+    <env name="SIMPLETEST_BASE_URL" value=""/>
+    <env name="SIMPLETEST_DB" value=""/>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="max%5Bself%5D=5&amp;max%5Bdirect%5D=999&amp;max%5Bindirect%5D=999&amp;quiet%5B0%5D=direct&amp;quiet%5B1%5D=indirect"/>
+    <env name="MINK_DRIVER_CLASS" value="Drupal\FunctionalJavascriptTests\DrupalSelenium2Drive"/>
+    <env name="MINK_DRIVER_ARGS" value=""/>
+    <env name="MINK_DRIVER_ARGS_WEBDRIVER" value=""/>
+  </php>
+
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory>../../drupal/marvin/Commands</directory>
+      <directory>../../drupal/marvin/src</directory>
+    </include>
+
+    <report>
+      <clover outputFile="reports/machine/coverage/phpunit.xml"/>
+      <html outputDirectory="reports/human/coverage/html"/>
+      <text outputFile="php://stdout"/>
+    </report>
+  </coverage>
+
+  <testsuites>
+    <testsuite name="unit">
+      <directory>../../drupal/marvin/tests/src/Unit</directory>
+    </testsuite>
+    <testsuite name="integration">
+      <directory>../../drupal/marvin/tests/src/Integration</directory>
+    </testsuite>
+  </testsuites>
+
+  <listeners>
+    <listener class="\Drupal\Tests\Listeners\DrupalListener"/>
+  </listeners>
+
+  <logging>
+    <testdoxHtml outputFile="reports/human/junit/phpunit.html"/>
+    <junit outputFile="reports/machine/junit/phpunit.xml"/>
+  </logging>
+</phpunit>

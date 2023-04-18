@@ -3,7 +3,3 @@ parameters:
 		- ../Commands/
 		- ../src/
 		- ../tests/src/
-		- ../RoboFile.php
-	#excludePaths:
-	#	- ../tests/_log/
-	#	- ../tests/_support/_generated/

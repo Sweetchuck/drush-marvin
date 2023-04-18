@@ -2,8 +2,8 @@ parameters:
 	typeAliases:
 		marvin-php-variant-command: '''
 			array{
-				envVar: array<string, null|string>,
-				command: string,
+				envVar?: array<string, null|string>,
+				executable: string,
 			}
 		'''
 		marvin-php-variant: '''
@@ -12,5 +12,198 @@ parameters:
 				enabled: bool,
 				binDir: string,
 				command: marvin-php-variant-command,
+			}
+		'''
+		marvin-runtime-environment-base: '''
+			array{
+				id?: string,
+				enabled?: bool,
+				provider?: string,
+				weight?: int|float,
+				description?: string|\Stringable,
+			}
+		'''
+		marvin-runtime-environment: '''
+			array{
+				id: string,
+				enabled: bool,
+				provider: string,
+				weight: int|float,
+				description: string|\Stringable,
+			}
+		'''
+		marvin-composer-info: '''
+			array{
+				name: string,
+				type?: string,
+				config?: array<string, mixed>,
+				dist?: array{
+					url: string,
+				},
+				extra?: array<string, mixed>,
+			}
+		'''
+		marvin-composer-lock: '''
+			array{
+				content-hash: string,
+				packages: 			array<string, marvin-composer-info>,
+				packages-dev: 		array<string, marvin-composer-info>,
+				aliases:            array<string, string>,
+				minimum-stability:  array<string, string>,
+				stability-flags:    array<string, int>,
+				prefer-stable:      bool,
+				prefer-lowest:      bool,
+				platform:           array<string, string>,
+				platform-dev:       array<string, string>,
+				plugin-api-version: string,
+			}
+		'''
+		marvin-composer-package-name-parts: '''
+			array{
+				vendor: string,
+				name: string,
+			}
+		'''
+		marvin-task-definition: '''
+			array{
+				id?: string,
+				description?: string,
+				provider?: string,
+				weight?: int|float,
+				task?: \Closure|\Robo\Contract\TaskInterface,
+				completion?: \Closure|\Robo\Contract\TaskInterface,
+				rollback?: \Closure|\Robo\Contract\TaskInterface,
+			}
+		'''
+		marvin-lint-reporter-config-base: '''
+			array{
+				service: string,
+				options: array<string, mixed>,
+			}
+		'''
+		marvin-artifact-type: '''
+			array{
+				label: string,
+				description: string,
+			}
+		'''
+		marvin-artifact-vanilla-state: '''
+			array{
+				artifactType: string,
+			}
+		'''
+		marvin-first-file: '''
+			array{
+				dir: string,
+				file: string,
+			}
+		'''
+		marvin-semversion-pre-release: '''
+			array{
+				type: string,
+				number: int,
+			}
+		'''
+		marvin-db-connection: '''
+			array{
+				driver: string,
+				username?: string,
+				password?: string,
+				host: string,
+				port?: int<1, 65535>,
+				database: string,
+				prefix?: string|array<string, string>,
+			}
+		'''
+		marvin-drupal-extension-version-number: '''
+			array{
+				coreMajor: int,
+				extensionMajor: int,
+				extensionMinor: int,
+				extensionPreType: string,
+				extensionPreMajor: int,
+				extensionBuild: string,
+			}
+		'''
+		marvin-status-report-entry-state: '''
+			array{
+				id?: string,
+				title?: string,
+				value?: string,
+				description?: string,
+				severity?: int<0, 7>,
+			}
+		'''
+		marvin-status-report-entry-export: '''
+			array{
+				id: string,
+				title: string,
+				value: string,
+				description: string,
+				severity: int<0, 7>,
+				severityName: string,
+			}
+		'''
+		marvin-rfc-log-level: 'int<0, 7>'
+		marvin-cli-exit-code: 'int<0, 255>'
+		marvin-symlink-upsert-action: '"create"|"delete"|"ignore"'
+		marvin-robo-task-base-options: '''
+			array{
+				assetNamePrefix?: string,
+			}
+		'''
+		marvin-robo-task-artifact-collect-files-options: '''
+			array{
+				assetNamePrefix?: string,
+				composerJsonFileName?: string,
+				packagePath?: string,
+				artifactDir?: string,
+			}
+		'''
+		marvin-robo-task-copy-files-options: '''
+			array{
+				assetNamePrefix?: string,
+				srcDir?: string,
+				dstDir?: string,
+				files?: string[]|\Symfony\Component\Finder\Finder|\Symfony\Component\Finder\SplFileInfo[],
+			}
+		'''
+		marvin-robo-task-node-detector-options: '''
+			array{
+				assetNamePrefix?: string,
+				rootDirectory?: string,
+				workingDirectory?: string,
+			}
+		'''
+		marvin-robo-task-pick-first-file-options: '''
+			array{
+				assetNamePrefix?: string,
+				assetNameBase?: string,
+				dirSuggestions?: string[]|array<string, bool>,
+				fileNameSuggestions?: string[]|array<string, bool>,
+			}
+		'''
+		marvin-robo-task-perpare-directory-options: '''
+			array{
+				assetNamePrefix?: string,
+				workingDirectory?: string,
+			}
+		'''
+		marvin-robo-task-symlink-upsert-options: '''
+			array{
+				assetNamePrefix?: string,
+				symlinkName?: string,
+				symlinkSrc?: string,
+				symlinkDst?: string,
+				actionOnSourceNotExists?: marvin-symlink-upsert-action,
+			}
+		'''
+		marvin-robo-task-version-number-bump-extension-info-options: '''
+			array{
+				assetNamePrefix?: string,
+				packagePath?: string,
+				versionNumber?: string,
+				bumpExtensionInfo?: bool,
+				bumpComposerJson?: bool,
 			}
 		'''

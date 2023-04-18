@@ -1,8 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drush\Commands\marvin;
+
+use Consolidation\AnnotatedCommand\CommandResult;
+use Drush\Attributes as CLI;
+use Drush\Boot\DrupalBootLevels;
 
 class DrushConfigCommands extends CommandsBase {
 
@@ -11,20 +15,19 @@ class DrushConfigCommands extends CommandsBase {
   protected string $customEventNamePrefix = 'marvin:drush-config';
 
   /**
-   * Prints out the current Drush configuration.
-   *
-   * @command marvin:drush-config
-   * @bootstrap max
-   *
-   * @option string $format
-   *   Output format.
+   * @phpstan-param array<string, mixed> $options
    */
-  public function drushConfig(
+  #[CLI\Command(name: 'marvin:drush-config')]
+  #[CLI\Help(
+    description: 'Prints out the current Drush configuration.',
+  )]
+  #[CLI\Bootstrap(level: DrupalBootLevels::MAX)]
+  public function cmdMarvinDrushConfigExecute(
     array $options = [
       'format' => 'yaml',
     ]
-  ): array {
-    return $this->getConfig()->export();
+  ): CommandResult {
+    return CommandResult::data($this->getConfig()->export());
   }
 
 }

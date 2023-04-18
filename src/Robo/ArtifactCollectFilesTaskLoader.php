@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\Robo;
 
@@ -10,6 +10,8 @@ trait ArtifactCollectFilesTaskLoader {
 
   /**
    * @return \Robo\Collection\CollectionBuilder|\Drupal\marvin\Robo\Task\ArtifactCollectFilesTask
+   *
+   * @phpstan-param marvin-robo-task-artifact-collect-files-options $options
    */
   protected function taskMarvinArtifactCollectFiles(array $options = []) {
     /** @var \Drupal\marvin\Robo\Task\ArtifactCollectFilesTask $task */

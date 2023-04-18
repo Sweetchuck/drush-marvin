@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Commands;
 
@@ -12,10 +12,14 @@ use Drush\Commands\marvin\DrushConfigCommands;
  * @group marvin
  * @group drush-command
  *
- * @covers \Drush\Commands\marvin\DrushConfigCommands<extended>
+ * @covers \Drush\Commands\marvin\DrushConfigCommands
+ * @covers \Drush\Commands\marvin\CommandsBase
  */
 class DrushConfigCommandsTest extends TaskTestBase {
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public static function casesDrushConfig(): array {
     return [
       'empty' => [
@@ -36,6 +40,10 @@ class DrushConfigCommandsTest extends TaskTestBase {
 
   /**
    * @dataProvider casesDrushConfig
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $configData
+   * @phpstan-param array<string, mixed> $options
    */
   public function testDrushConfig(array $expected, array $configData, array $options): void {
     $this->config->addContext('foo', new Config($configData));
@@ -43,8 +51,11 @@ class DrushConfigCommandsTest extends TaskTestBase {
     $commands = new DrushConfigCommands();
     $commands->setConfig($this->config);
 
-    $actual = $commands->drushConfig($options);
-    static::assertSame($expected, $actual);
+    $actual = $commands->cmdDrushConfigExecute($options);
+    static::assertSame(
+      $expected,
+      $actual->getOutputData(),
+    );
   }
 
 }

@@ -1,15 +1,20 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin;
 
-use Stringy\StaticStringy;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\String\UnicodeString;
 
 /**
+ * @template TKey   of string
+ * @template TValue of mixed
+ *
+ * @implements \ArrayAccess<TKey, TValue>
+ *
  * @property-read string $name
  * @property-read string $packageVendor
  * @property-read string $packageName
@@ -25,6 +30,11 @@ class ComposerInfo implements \ArrayAccess {
 
   protected Filesystem $fs;
 
+  /**
+   * @phpstan-var marvin-composer-info
+   *
+   * @phpstan-ignore-next-line
+   */
   protected array $json = [];
 
   protected string $jsonFileName = '';
@@ -39,6 +49,11 @@ class ComposerInfo implements \ArrayAccess {
 
   protected int $jsonChangedTime = 0;
 
+  /**
+   * @phpstan-var marvin-composer-lock
+   *
+   * @phpstan-ignore-next-line
+   */
   protected array $lock = [];
 
   protected string $lockFileName = '';
@@ -49,6 +64,9 @@ class ComposerInfo implements \ArrayAccess {
 
   protected int $lockChangedTime = 0;
 
+  /**
+   * @phpstan-var array<string, mixed>
+   */
   protected array $jsonDefault = [
     'type' => 'library',
     'config' => [
@@ -62,8 +80,16 @@ class ComposerInfo implements \ArrayAccess {
       $jsonFileName = Utils::getComposerJsonFileName();
     }
 
-    $instanceId = Path::isAbsolute($jsonFileName) ? $jsonFileName : Path::join(($baseDir ?: getcwd()), $jsonFileName);
+    // @todo Avoid using \getcwd() here.
+    $instanceId = Path::isAbsolute($jsonFileName) ?
+      $jsonFileName
+      : Path::join(
+        ($baseDir ?: (string) getcwd()),
+        $jsonFileName,
+      );
+
     if (!isset(static::$instances[$instanceId])) {
+      /* @phpstan-ignore-next-line */
       static::$instances[$instanceId] = new static($jsonFileName, $fs, $baseDir);
     }
 
@@ -72,7 +98,9 @@ class ComposerInfo implements \ArrayAccess {
 
   protected function __construct(string $jsonFileName, ?Filesystem $fs = NULL, string $baseDir = '') {
     $this->fs = $fs ?: new Filesystem();
-    $this->jsonFileName = Path::isAbsolute($jsonFileName) ? $jsonFileName : Path::join(($baseDir ?: getcwd()), $jsonFileName);
+    $this->jsonFileName = Path::isAbsolute($jsonFileName) ?
+      $jsonFileName
+      : Path::join(($baseDir ?: (string) getcwd()), $jsonFileName);
     $this->initLockFileName();
   }
 
@@ -98,10 +126,10 @@ class ComposerInfo implements \ArrayAccess {
   /**
    * {@inheritdoc}
    */
-  #[\ReturnTypeWillChange]
-  public function offsetGet($offset) {
+  public function offsetGet($offset): mixed {
     $this->initJson();
 
+    /* @phpstan-ignore-next-line */
     return $this->json[$offset];
   }
 
@@ -110,6 +138,7 @@ class ComposerInfo implements \ArrayAccess {
    */
   public function offsetSet($offset, $value): void {
     $this->initJson();
+    /* @phpstan-ignore-next-line */
     $this->json[$offset] = $value;
   }
 
@@ -121,7 +150,7 @@ class ComposerInfo implements \ArrayAccess {
     unset($this->json[$offset]);
   }
 
-  public function __get($name) {
+  public function __get(string $name): mixed {
     $this->initJson();
 
     if (array_key_exists($name, $this->json)) {
@@ -146,20 +175,30 @@ class ComposerInfo implements \ArrayAccess {
     $pattern = 'Undefined property via __get(): "%s" in "%s" on line "%d"';
     $trace = debug_backtrace();
     trigger_error(
-      sprintf($pattern, $name, $trace[0]['file'], $trace[0]['line']),
-      E_USER_NOTICE
+      sprintf(
+        $pattern,
+        $name,
+        $trace[0]['file'] ?? 'unknown',
+        $trace[0]['line'] ?? 'unknown',
+      ),
+      \E_NOTICE,
     );
 
+    /* @phpstan-ignore-next-line */
     return NULL;
   }
 
   protected function initJson(): static {
     $this->checkJsonExists();
     $changedTime = filectime($this->jsonFileName);
-    if ($changedTime > $this->jsonChangedTime) {
+    if ($changedTime !== FALSE && $changedTime > $this->jsonChangedTime) {
+      /* @phpstan-ignore-next-line */
       $this->json = array_replace_recursive(
         $this->jsonDefault,
-        json_decode(file_get_contents($this->jsonFileName), TRUE)
+        json_decode(
+          file_get_contents($this->jsonFileName) ?: '{}',
+          TRUE,
+        ),
       );
 
       $this->jsonChangedTime = $changedTime;
@@ -176,14 +215,29 @@ class ComposerInfo implements \ArrayAccess {
 
   protected function initLockReadFile(): static {
     if (!$this->fs->exists($this->lockFileName)) {
-      $this->lock = [];
+      $this->lock = [
+        'content-hash' => '',
+        'packages' => [],
+        'packages-dev' => [],
+        'aliases' => [],
+        'minimum-stability' => [],
+        'stability-flags' => [],
+        'prefer-stable' => TRUE,
+        'prefer-lowest' => FALSE,
+        'platform' => [],
+        'platform-dev' => [],
+        'plugin-api-version' => '',
+      ];
 
       return $this;
     }
 
     $changedTime = filectime($this->lockFileName);
-    if ($changedTime > $this->lockChangedTime) {
-      $this->lock = json_decode(file_get_contents($this->lockFileName), TRUE);
+    if ($changedTime !== FALSE && $changedTime > $this->lockChangedTime) {
+      $this->lock = json_decode(
+        file_get_contents($this->lockFileName) ?: '{}',
+        TRUE,
+      );
       $this->lockChangedTime = $changedTime;
     }
 
@@ -212,12 +266,18 @@ class ComposerInfo implements \ArrayAccess {
     return $this;
   }
 
+  /**
+   * @phpstan-return marvin-composer-info
+   */
   public function getJson(): array {
     return $this
       ->initJson()
       ->json;
   }
 
+  /**
+   * @phpstan-return marvin-composer-lock
+   */
   public function getLock(): array {
     return $this
       ->initLock()
@@ -225,7 +285,9 @@ class ComposerInfo implements \ArrayAccess {
   }
 
   public function getDrupalExtensionInstallDir(string $type): ?string {
-    $type = StaticStringy::ensureLeft($type, 'drupal-');
+    $type = (new UnicodeString($type))
+      ->ensureStart('drupal-')
+      ->toString();
     $json = $this->getJson();
     $installerPaths = $json['extra']['installer-paths'] ?? [];
 

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin;
 
@@ -47,7 +47,7 @@ class WriterWrapper {
     return $this->destinationMode;
   }
 
-  public function setDestinationMode(string $destinationMode) {
+  public function setDestinationMode(string $destinationMode): static {
     $this->reset();
     $this->destinationMode = $destinationMode;
 
@@ -56,8 +56,10 @@ class WriterWrapper {
 
   /**
    * @see \Symfony\Component\Console\Output\OutputInterface::write
+   *
+   * @phpstan-param string|iterable<string> $messages
    */
-  public function write($messages, $newLine = FALSE, $options = 0): static {
+  public function write(string|iterable $messages, bool $newLine = FALSE, int $options = 0): static {
     $this->init();
     // @todo Error if the not initialized.
     if ($this->destinationInstance) {
@@ -91,8 +93,8 @@ class WriterWrapper {
       $fs = new Filesystem();
       $fs->mkdir(dirname($destination));
 
-      $this->destinationResource = fopen($destination, $this->getDestinationMode());
-      if ($this->destinationResource === FALSE) {
+      $this->destinationResource = fopen($destination, $this->getDestinationMode()) ?: NULL;
+      if ($this->destinationResource === NULL) {
         throw new \RuntimeException("File '$destination' could not be opened.");
       }
 

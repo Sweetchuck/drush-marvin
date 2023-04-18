@@ -1,20 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\marvin\Unit\Robo\Task;
 
 use Drupal\Tests\marvin\Unit\TaskTestBase;
 use org\bovigo\vfs\vfsStream;
-use Stringy\StaticStringy;
+use Symfony\Component\String\UnicodeString;
 
 /**
  * @group marvin
  * @group robo-task
  *
- * @covers \Drupal\marvin\Robo\Task\ArtifactCollectFilesTask<extended>
+ * @covers \Drupal\marvin\Robo\Task\ArtifactCollectFilesTask
+ * @covers \Drupal\marvin\Robo\Task\BaseTask
  * @covers \Drupal\marvin\Robo\ArtifactCollectFilesTaskLoader
  */
 class ArtifactCollectFilesTaskTest extends TaskTestBase {
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesRunSuccess(): array {
     $cases = [];
     foreach (['module', 'theme', 'drush', 'profile'] as $projectType) {
@@ -27,9 +33,12 @@ class ArtifactCollectFilesTaskTest extends TaskTestBase {
 
   /**
    * @dataProvider casesRunSuccess
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $vfsStructure
    */
-  public function testRunSuccess(array $expected, array $structure): void {
-    $vfs = vfsStream::setup(__FUNCTION__, NULL, $structure);
+  public function testRunSuccess(array $expected, array $vfsStructure): void {
+    $vfs = vfsStream::setup(__FUNCTION__, NULL, $vfsStructure);
     $this->config->set('marvin.buildDir', 'build');
 
     $options = [
@@ -43,7 +52,7 @@ class ArtifactCollectFilesTaskTest extends TaskTestBase {
       ->run();
 
     $actual = [];
-    /** @var \Symfony\Component\Finder\SplFileInfo $file */
+    /** @var \Symfony\Component\Finder\SplFileInfo[] $files */
     foreach ($result['files'] as $files) {
       foreach ($files as $file) {
         $actual[] = $file->getRelativePathname();
@@ -56,8 +65,15 @@ class ArtifactCollectFilesTaskTest extends TaskTestBase {
     static::assertSame($expected, $actual);
   }
 
+  /**
+   * @phpstan-return array{expected: string[], structure: array<string, mixed>}
+   */
   protected function getDrupalExtensionFiles(string $name, string $type): array {
-    $nameUpperCamel = StaticStringy::upperCamelize($name);
+    $nameUpperCamel = (new UnicodeString("a_$name"))
+      ->camel()
+      ->trimPrefix('a')
+      ->toString();
+
     $fileContent = 'a';
 
     $mainFileName = $type === 'drush' ? "$name.module" : "$name.$type";
@@ -147,6 +163,9 @@ class ArtifactCollectFilesTaskTest extends TaskTestBase {
     ];
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   protected function getStructureOfTheUndesirableFiles(): array {
     $fileContent = 'a';
     $dirContent = [

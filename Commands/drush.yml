@@ -115,7 +115,7 @@ marvin:
         #
         # @var string
         ##
-        binDir: '${env.HOME}/slash/usr/share/pmkr-php-070433-nts/bin'
+        binDir: '/usr/bin'
 
         command:
           ##
@@ -134,30 +134,6 @@ marvin:
           ##
           executable: >
             ${marvin.php.variant.min.binDir}/php
-            -d 'extension=pcov'
-
-      plus1:
-        id: 'plus1'
-        enabled: true
-        binDir: '${env.home}/slash/usr/share/pmkr-php-080026-nts/bin'
-        command:
-          envVar:
-            PHPRC: ''
-            PHP_INI_SCAN_DIR: ''
-          executable: >
-            ${marvin.php.variant.plus1.binDir}/php
-            -d 'extension=pcov'
-
-      plus2:
-        id: 'plus2'
-        enabled: true
-        binDir: '${env.home}/slash/usr/share/pmkr-php-080113-nts/bin'
-        command:
-          envVar:
-            PHPRC: ''
-            PHP_INI_SCAN_DIR: ''
-          executable: >
-            ${marvin.php.variant.plus2.binDir}/php
             -d 'extension=pcov'
 
   lint:
@@ -201,29 +177,6 @@ marvin:
           #showColumnNumber: false
           #showMessage: true
 
-  phpcs:
-    ##
-    # Keys are environment names.
-    #
-    # The values come from the "./preset" configuration.
-    #
-    # @var string[]
-    ##
-    defaultPreset:
-      local: 'default'
-      localPreCommit: 'default'
-      watch: 'default'
-      ci: 'default'
-      ciJenkins: 'default'
-    preset:
-      default:
-        failOn: 'warning'
-        standards:
-          Drupal: true
-          DrupalPractice: true
-      ciJenkins:
-        failOn: 'never'
-
   ##
   # Keys are the official Git hook names.
   #
@@ -266,22 +219,3 @@ marvin:
           ##
           #examples:
           #  'Issue #42 - Something': true
-
-  phpunit:
-    ##
-    # Keys are environment variant names.
-    #
-    # @var array
-    ##
-    testSuite:
-      ##
-      #   - null Run all.
-      #   - true Run all.
-      #   - false Run none
-      #   - bool[] Run all "true" test suite.
-      #           If all of them is "false" then run none.
-      #
-      # @var null|bool|bool[]
-      ##
-      localPreCommit:
-        Unit: true

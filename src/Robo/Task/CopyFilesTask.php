@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\Robo\Task;
 
@@ -68,6 +68,9 @@ class CopyFilesTask extends BaseTask {
     $this->fs = $fs ?: new Filesystem();
   }
 
+  /**
+   * @phpstan-param marvin-robo-task-copy-files-options $options
+   */
   public function setOptions(array $options): static {
     parent::setOptions($options);
 

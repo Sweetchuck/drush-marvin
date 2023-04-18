@@ -1,41 +1,58 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drush\Commands\marvin;
 
 use Consolidation\AnnotatedCommand\CommandData;
+use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
+use Drush\Attributes as CLI;
+use Drush\Boot\DrupalBootLevels;
 use Sweetchuck\Utils\Comparer\ArrayValueComparer;
 
 class ArtifactTypesCommands extends ArtifactCommandsBase {
 
+  /**
+   * @phpstan-var array<string, marvin-artifact-type>
+   */
   protected array $types = [];
 
   /**
-   * Lists all available artifact types.
+   * @phpstan-param array<string, mixed> $options
    *
-   * @command marvin:artifact:types
-   *
-   * @bootstrap none
-   *
-   * @default-string-field id
-   * @default-fields id,label,description
-   * @field-labels
-   *   id: ID
-   *   label: Label
-   *   description: Description
-   *   weight: Weight
+   * @phpstan-return array<string, marvin-artifact-type>
    *
    * @todo Change return type to CommandResult.
    */
-  public function cmdArtifactTypesExecute(
+  #[CLI\Command(name: 'marvin:artifact:types')]
+  #[CLI\Help(
+    description: 'Lists all available artifact types.'
+  )]
+  #[CLI\Bootstrap(level: DrupalBootLevels::NONE)]
+  #[CLI\Format(
+    listDelimiter: ':',
+    tableStyle: 'compact',
+  )]
+  #[CLI\DefaultFields(
+    fields: [
+      'id',
+      'label',
+      'description',
+    ],
+  )]
+  #[CLI\FieldLabels(
+    labels: [
+      'id' => 'ID',
+      'label' => 'Label',
+      'description' => 'Description',
+      'weight' => 'Weight',
+    ],
+  )]
+  public function cmdMarvinArtifactTypesExecute(
     array $options = [
       'format' => 'yaml',
-      'fields' => '',
-      'include-field-labels' => TRUE,
-      'table-style' => 'compact',
-    ]
+    ],
   ): array {
     return $this
       ->collectArtifactTypes()
@@ -44,10 +61,11 @@ class ArtifactTypesCommands extends ArtifactCommandsBase {
       ->types;
   }
 
-  /**
-   * @hook alter marvin:artifact:types
-   */
-  public function cmdArtifactTypesAlter($result, CommandData $commandData) {
+  #[CLI\Hook(
+    type: HookManager::ALTER_RESULT,
+    target: 'marvin:artifact:types',
+  )]
+  public function cmdMarvinArtifactTypesAlter(mixed $result, CommandData $commandData): mixed {
     $expectedFormat = $commandData->input()->getOption('format');
     if ($expectedFormat === 'table' && is_array($result)) {
       return $this->convertArtifactTypesToRowsOfFields($result);
@@ -56,10 +74,7 @@ class ArtifactTypesCommands extends ArtifactCommandsBase {
     return $result;
   }
 
-  /**
-   * @return $this
-   */
-  protected function collectArtifactTypes() {
+  protected function collectArtifactTypes(): static {
     $projectType = $this->getConfig()->get('marvin.projectType');
 
     /** @var callable[] $eventHandlers */
@@ -72,10 +87,7 @@ class ArtifactTypesCommands extends ArtifactCommandsBase {
     return $this;
   }
 
-  /**
-   * @return $this
-   */
-  protected function expandArtifactTypes() {
+  protected function expandArtifactTypes(): static {
     foreach ($this->types as $id => &$info) {
       $info['id'] = $id;
       $info += ['weight' => 0];
@@ -84,27 +96,39 @@ class ArtifactTypesCommands extends ArtifactCommandsBase {
     return $this;
   }
 
-  /**
-   * @return $this
-   */
-  protected function sortArtifactTypes() {
+  protected function sortArtifactTypes(): static {
     uasort($this->types, $this->getArtifactTypesComparer());
 
     return $this;
   }
 
   protected function getArtifactTypesComparer(): callable {
-    return new ArrayValueComparer($this->getArtifactTypesComparerConfig());
+    $comparer = new ArrayValueComparer();
+    $comparer->setOptions($this->getArtifactTypesComparerOptions());
+
+    return $comparer;
   }
 
-  protected function getArtifactTypesComparerConfig(): array {
+  /**
+   * @phpstan-return array<string, mixed>
+   */
+  protected function getArtifactTypesComparerOptions(): array {
     return [
-      'weight' => 0,
-      'label' => '',
-      'id' => '',
+      'weight' => [
+        'default' => 0,
+      ],
+      'label' => [
+        'default' => '',
+      ],
+      'id' => [
+        'default' => '',
+      ],
     ];
   }
 
+  /**
+   * @phpstan-param array<string, marvin-artifact-type> $artifactTypes
+   */
   protected function convertArtifactTypesToRowsOfFields(array $artifactTypes): RowsOfFields {
     return new RowsOfFields($artifactTypes);
   }

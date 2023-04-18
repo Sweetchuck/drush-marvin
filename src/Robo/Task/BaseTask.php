@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\Robo\Task;
 
@@ -15,8 +15,8 @@ use Robo\TaskInfo;
 use Symfony\Component\Process\Process;
 
 abstract class BaseTask extends RoboBaseTask implements
-    ContainerAwareInterface,
-    OutputAwareInterface {
+  ContainerAwareInterface,
+  OutputAwareInterface {
 
   use ContainerAwareTrait;
   use IO;
@@ -29,8 +29,14 @@ abstract class BaseTask extends RoboBaseTask implements
    */
   protected string $taskName = '';
 
+  /**
+   * @phpstan-var array<string, mixed>
+   */
   protected array $assets = [];
 
+  /**
+   * @phpstan-var array<string, mixed>
+   */
   protected array $options = [];
 
   protected string $assetNamePrefix = '';
@@ -78,6 +84,9 @@ abstract class BaseTask extends RoboBaseTask implements
     return $this;
   }
 
+  /**
+   * @phpstan-param marvin-robo-task-base-options $options
+   */
   public function setOptions(array $options): static {
     if (array_key_exists('assetNamePrefix', $options)) {
       $this->setAssetNamePrefix($options['assetNamePrefix']);
@@ -130,6 +139,9 @@ abstract class BaseTask extends RoboBaseTask implements
     );
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   protected function getAssetsWithPrefixedNames(): array {
     $prefix = $this->getAssetNamePrefix();
     if (!$prefix) {
@@ -160,8 +172,12 @@ abstract class BaseTask extends RoboBaseTask implements
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-param null|array<string, mixed> $context
+   *
+   * @phpstan-return array<string, mixed>
    */
-  protected function getTaskContext($context = NULL) {
+  protected function getTaskContext($context = NULL): array {
     $context = parent::getTaskContext($context);
     $context['name'] = $this->getTaskName();
 

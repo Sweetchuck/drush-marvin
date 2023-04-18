@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Robo\Task;
 
@@ -13,11 +13,15 @@ use Symfony\Component\Filesystem\Path;
  * @group marvin
  * @group robo-task
  *
- * @covers \Drupal\marvin\Robo\Task\VersionNumberBumpExtensionInfoTask<extended>
+ * @covers \Drupal\marvin\Robo\Task\VersionNumberBumpExtensionInfoTask
+ * @covers \Drupal\marvin\Robo\Task\BaseTask
  * @covers \Drupal\marvin\Robo\VersionNumberTaskLoader
  */
 class VersionNumberBumpExtensionInfoTaskTest extends TaskTestBase {
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesRunSuccess(): array {
     $composerJsonBefore = implode(PHP_EOL, [
       '{',
@@ -128,6 +132,10 @@ class VersionNumberBumpExtensionInfoTaskTest extends TaskTestBase {
 
   /**
    * @dataProvider casesRunSuccess
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $vfsStructure
+   * @phpstan-param array<string, mixed> $options
    */
   public function testRunSuccess(array $expected, array $vfsStructure, array $options): void {
     $expected += [
@@ -177,6 +185,9 @@ class VersionNumberBumpExtensionInfoTaskTest extends TaskTestBase {
     }
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesRunFail(): array {
     return [
       'packagePath.empty' => [
@@ -224,8 +235,11 @@ class VersionNumberBumpExtensionInfoTaskTest extends TaskTestBase {
 
   /**
    * @dataProvider casesRunFail
+   *
+   * @phpstan-param array<string, mixed> $options
+   * @phpstan-param array<string, mixed> $vfsStructure
    */
-  public function testRunFail($expected, array $options = [], array $vfsStructure = []): void {
+  public function testRunFail(mixed $expected, array $options = [], array $vfsStructure = []): void {
     if (array_key_exists('class', $expected)) {
       $this->expectException($expected['class']);
     }

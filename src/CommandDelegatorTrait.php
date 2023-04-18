@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin;
 
-use Sweetchuck\Utils\Comparer\ArrayValueComparer;
 use Robo\Collection\CollectionBuilder;
 use Robo\Contract\TaskInterface;
+use Sweetchuck\Utils\Comparer\ArrayValueComparer;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
@@ -25,6 +25,8 @@ trait CommandDelegatorTrait {
   }
 
   /**
+   * @phpstan-param array<mixed> $args
+   *
    * @todo Find a better name for this method.
    * @todo Make this method universal.
    * @todo Trigger a *.alter event.
@@ -41,14 +43,17 @@ trait CommandDelegatorTrait {
     return $cb;
   }
 
+  /**
+   * @phpstan-param array<mixed> $args
+   *
+   * @phpstan-return array<string, marvin-task-definition>
+   */
   protected function delegateCollectTaskDefinitions(string $eventBaseName, array $args): array {
     $eventName = $this->getCustomEventName($eventBaseName);
-    if (!empty($this->logger)) {
-      $this->logger->debug(
-        'Collecting task definitions for event "<info>{eventName}</info>"',
-        ['eventName' => $eventName]
-      );
-    }
+    $this->getLogger()->debug(
+      'Collecting task definitions for event "<info>{eventName}</info>"',
+      ['eventName' => $eventName],
+    );
 
     $taskDefinitions = [];
     /** @var callable[] $eventHandlers */
@@ -65,12 +70,21 @@ trait CommandDelegatorTrait {
       }
       $taskDefinitions += $tasks;
     }
-    uasort($taskDefinitions, new ArrayValueComparer(['weight' => 0]));
+
+    $comparer = new ArrayValueComparer();
+    $comparer->setKeys([
+      'weight' => [
+        'default' => 0,
+      ],
+    ]);
+    uasort($taskDefinitions, $comparer);
 
     return $taskDefinitions;
   }
 
   /**
+   * @phpstan-param array<mixed> $args
+   *
    * @SuppressWarnings(UnusedFormalParameter)
    */
   protected function delegatePrepareCollectionBuilder(
@@ -81,6 +95,9 @@ trait CommandDelegatorTrait {
     return $this;
   }
 
+  /**
+   * @phpstan-param array<string, marvin-task-definition> $taskDefinitions
+   */
   protected function delegateAddTasks(CollectionBuilder $cb, array $taskDefinitions): static {
     $taskTypes = ['task', 'rollback', 'completion'];
     foreach ($taskDefinitions as $taskDefinition) {
@@ -118,6 +135,9 @@ trait CommandDelegatorTrait {
     return $this;
   }
 
+  /**
+   * @phpstan-param array<string, marvin-task-definition> $taskDefinitions
+   */
   protected function delegateLogTaskDefinitions(string $eventBaseName, array $taskDefinitions): static {
     $logger = $this->getLogger();
     $logArgs = [

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Commands;
 
@@ -14,7 +14,8 @@ use Symfony\Component\Yaml\Yaml;
  * @group marvin
  * @group drush-command
  *
- * @covers \Drush\Commands\marvin\LintCommandsBase<extended>
+ * @covers \Drush\Commands\marvin\LintCommandsBase
+ * @covers \Drush\Commands\marvin\CommandsBase
  */
 class LintCommandsBaseTest extends CommandsTestBase {
 
@@ -54,6 +55,9 @@ class LintCommandsBaseTest extends CommandsTestBase {
     static::assertSame('marvin:lint', $method->invokeArgs($commands, []));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public static function casesGetLintReporterConfigNamesByEnvironmentVariant(): array {
     $marvinRootDir = static::getMarvinRootDir();
     $default = Yaml::parseFile("{$marvinRootDir}/Commands/drush.yml");
@@ -71,6 +75,9 @@ class LintCommandsBaseTest extends CommandsTestBase {
 
   /**
    * @dataProvider casesGetLintReporterConfigNamesByEnvironmentVariant
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $configData
    */
   public function testGetLintReporterConfigNamesByEnvironmentVariant(array $expected, array $configData = []): void {
     $configData = array_replace_recursive(
@@ -90,6 +97,9 @@ class LintCommandsBaseTest extends CommandsTestBase {
     static::assertSame($expected, $method->invokeArgs($commands, []));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public static function casesGetLintReporters(): array {
     $marvinRootDir = static::getMarvinRootDir();
     $default = Yaml::parseFile("{$marvinRootDir}/Commands/drush.yml");
@@ -110,6 +120,9 @@ class LintCommandsBaseTest extends CommandsTestBase {
 
   /**
    * @dataProvider casesGetLintReporters
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $configData
    */
   public function testGetLintReporters(array $expected, array $configData): void {
     $configData = array_replace_recursive(
@@ -149,7 +162,9 @@ class LintCommandsBaseTest extends CommandsTestBase {
   public function testParseLintReporterConfigs(): void {
     $container = new Container();
     $this->initContainerLintReporters($container);
-    $container->add('lintVerboseReporter', VerboseReporter::class, FALSE);
+    $container
+      ->add('lintVerboseReporter', VerboseReporter::class)
+      ->setShared(FALSE);
 
     $config = new Config($this->getDefaultConfigData());
 

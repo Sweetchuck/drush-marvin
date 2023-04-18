@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Commands;
 
@@ -12,12 +12,14 @@ use Robo\Config\Config;
  * @group marvin
  * @group drush-command
  *
- * @covers \Drush\Commands\marvin\CommandsBase<extended>
+ * @covers \Drush\Commands\marvin\CommandsBase
  */
 class CommandsBaseTest extends CommandsTestBase {
 
   /**
    * @dataProvider casesGetEnvironment
+   *
+   * @phpstan-return array<string, mixed>
    */
   public static function casesGetEnvironment(): array {
     return [
@@ -35,8 +37,10 @@ class CommandsBaseTest extends CommandsTestBase {
 
   /**
    * @dataProvider casesGetEnvironment
+   *
+   * @phpstan-param array<string, mixed> $configData
    */
-  public function testGetEnvironment(string $expected, array $configData = []) {
+  public function testGetEnvironment(string $expected, array $configData = []): void {
     $configData = array_replace_recursive($this->getDefaultConfigData(), $configData);
     $config = new Config($configData);
     $container = new Container();
@@ -56,6 +60,9 @@ class CommandsBaseTest extends CommandsTestBase {
     static::assertSame($expected, $environment);
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public static function casesGetEnvironmentVariants(): array {
     return [
       'basic' => [
@@ -81,8 +88,11 @@ class CommandsBaseTest extends CommandsTestBase {
 
   /**
    * @dataProvider casesGetEnvironmentVariants
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $configData
    */
-  public function testGetEnvironmentVariants(array $expected, array $configData = []) {
+  public function testGetEnvironmentVariants(array $expected, array $configData = []): void {
     $configData = array_replace_recursive($this->getDefaultConfigData(), $configData);
     $container = new Container();
 
@@ -94,7 +104,6 @@ class CommandsBaseTest extends CommandsTestBase {
     $method = $class->getMethod($methodName);
     $method->setAccessible(TRUE);
 
-    /** @var string[] $environment */
     $envVariants = $method->invokeArgs($this->commands, []);
 
     static::assertSame($expected, $envVariants);

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Commands;
 
@@ -16,10 +16,14 @@ use Symfony\Component\ErrorHandler\BufferingLogger;
  * @group marvin
  * @group drush-command
  *
- * @covers \Drush\Commands\marvin\StatusReportCommands<extended>
+ * @covers \Drush\Commands\marvin\StatusReportCommands
+ * @covers \Drush\Commands\marvin\CommandsBase
  */
 class StatusReportCommandsRunTest extends TaskTestBase {
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public static function casesStatusReport(): array {
     $notice1 = StatusReportEntry::__set_state([
       'id' => 'n1',
@@ -57,6 +61,10 @@ class StatusReportCommandsRunTest extends TaskTestBase {
 
   /**
    * @dataProvider casesStatusReport
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $entriesCollection
+   * @phpstan-param array<string, mixed> $options
    */
   public function testStatusReport(array $expected, array $entriesCollection, array $options = []): void {
     $hookManager = new HookManager();
@@ -78,7 +86,7 @@ class StatusReportCommandsRunTest extends TaskTestBase {
 
     $commandResult = $commands->cmdStatusReportExecute($options);
 
-    /** @var \Drupal\marvin\StatusReport\StatusReportInterface $actualStatusReport */
+    /** @phpstan-var \Drupal\marvin\StatusReport\StatusReportInterface<string, \Drupal\marvin\StatusReport\StatusReportEntryInterface> $actualStatusReport */
     $actualStatusReport = $commandResult->getOutputData();
 
     static::assertInstanceOf(StatusReportInterface::class, $actualStatusReport);
@@ -95,6 +103,9 @@ class StatusReportCommandsRunTest extends TaskTestBase {
     }
   }
 
+  /**
+   * @phpstan-param array<string, mixed> $entries
+   */
   protected function createHookCallbackForMarvinStatusReport(array $entries): callable {
     return function () use ($entries): array {
       return $entries;

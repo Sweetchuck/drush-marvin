@@ -1,12 +1,18 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\StatusReport;
 
 use Drupal\marvin\RfcLogLevel;
 use Drupal\marvin\Utils;
 
+/**
+ * @template           TKey   of string
+ * @template-covariant TValue of \Drupal\marvin\StatusReport\StatusReportEntryInterface
+ *
+ * @implements \Drupal\marvin\StatusReport\StatusReportInterface<TKey, TValue>
+ */
 class StatusReport implements StatusReportInterface {
 
   /**
@@ -14,7 +20,26 @@ class StatusReport implements StatusReportInterface {
    */
   protected array $entries = [];
 
+  /**
+   * @phpstan-var marvin-rfc-log-level
+   */
   protected int $lowestSeverityAssError = RfcLogLevel::ERROR;
+
+  /**
+   * @phpstan-return marvin-rfc-log-level
+   */
+  public function getLowestSeverityAsError(): int {
+    return $this->lowestSeverityAssError;
+  }
+
+  /**
+   * @phpstan-param marvin-rfc-log-level $severity
+   */
+  public function setLowestSeverityAsError(int $severity): static {
+    $this->lowestSeverityAssError = $severity;
+
+    return $this;
+  }
 
   /**
    * {@inheritdoc}
@@ -32,6 +57,8 @@ class StatusReport implements StatusReportInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-return array<string, marvin-status-report-entry-export>
    */
   public function jsonSerialize(): array {
     $data = [];
@@ -42,14 +69,20 @@ class StatusReport implements StatusReportInterface {
     return $data;
   }
 
+  /**
+   * @phpstan-return array<string, marvin-status-report-entry-export>
+   */
   public function getOutputData() {
     return $this->jsonSerialize();
   }
 
+  /**
+   * @phpstan-return marvin-cli-exit-code
+   */
   public function getExitCode() {
     return Utils::getExitCodeBasedOnSeverity(
       $this->getHighestSeverity(),
-      $this->getLowestSeverityAsError()
+      $this->getLowestSeverityAsError(),
     );
   }
 
@@ -73,9 +106,6 @@ class StatusReport implements StatusReportInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function removeAllEntries(): static {
     $this->entries = [];
 
@@ -99,16 +129,6 @@ class StatusReport implements StatusReportInterface {
     }
 
     return $highestSeverity;
-  }
-
-  public function getLowestSeverityAsError(): int {
-    return $this->lowestSeverityAssError;
-  }
-
-  public function setLowestSeverityAsError(int $severity): static {
-    $this->lowestSeverityAssError = $severity;
-
-    return $this;
   }
 
 }

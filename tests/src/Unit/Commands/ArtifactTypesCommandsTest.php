@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Commands;
 
@@ -19,7 +19,9 @@ use Symfony\Component\Console\Input\InputOption;
  * @group marvin
  * @group drush-command
  *
- * @covers \Drush\Commands\marvin\ArtifactTypesCommands<extended>
+ * @covers \Drush\Commands\marvin\ArtifactTypesCommands
+ * @covers \Drush\Commands\marvin\ArtifactCommandsBase
+ * @covers \Drush\Commands\marvin\CommandsBase
  */
 class ArtifactTypesCommandsTest extends TaskTestBase {
 
@@ -32,6 +34,9 @@ class ArtifactTypesCommandsTest extends TaskTestBase {
     static::assertSame('marvin:artifact', $method->invoke($commands));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public static function casesGetCustomEventName(): array {
     return [
       'empty' => ['marvin:artifact', ''],
@@ -51,6 +56,9 @@ class ArtifactTypesCommandsTest extends TaskTestBase {
     static::assertSame($expected, $method->invoke($commands, $eventBaseName));
   }
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public static function casesArtifactTypes(): array {
     return [
       'basic' => [
@@ -93,6 +101,10 @@ class ArtifactTypesCommandsTest extends TaskTestBase {
 
   /**
    * @dataProvider casesArtifactTypes
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $registeredArtifactTypes
+   * @phpstan-param array<string, mixed> $options
    */
   public function testArtifactTypes(array $expected, string $projectType, array $registeredArtifactTypes, array $options = []): void {
     $hookManager = new HookManager();
@@ -127,6 +139,10 @@ class ArtifactTypesCommandsTest extends TaskTestBase {
     static::assertSame(['a' => 'b'], $actual->getArrayCopy());
   }
 
+  /**
+   * @phpstan-param array<string, mixed> $options
+   * @phpstan-param array<string, mixed> $args
+   */
   protected function createCommandData(array $options = [], array $args = []): CommandData {
     $inputDefinition = new InputDefinition([
       'format' => new InputOption('format', NULL, InputOption::VALUE_OPTIONAL),
@@ -149,6 +165,9 @@ class ArtifactTypesCommandsTest extends TaskTestBase {
     return $commandData;
   }
 
+  /**
+   * @phpstan-param array<string, mixed> $artifactTypes
+   */
   protected function createHookCallbackForMarvinArtifactTypes(array $artifactTypes): callable {
     return function (string $projectType) use ($artifactTypes): array {
       return $artifactTypes[$projectType] ?? [];

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Robo\Task;
 
@@ -12,11 +12,15 @@ use Symfony\Component\Filesystem\Path;
  * @group marvin
  * @group robo-task
  *
- * @covers \Drupal\marvin\Robo\Task\PrepareDirectoryTask<extended>
+ * @covers \Drupal\marvin\Robo\Task\PrepareDirectoryTask
+ * @covers \Drupal\marvin\Robo\Task\BaseTask
  * @covers \Drupal\marvin\Robo\PrepareDirectoryTaskLoader
  */
 class PrepareDirectoryTaskTest extends TaskTestBase {
 
+  /**
+   * @phpstan-return array<string, mixed>
+   */
   public function casesRun(): array {
     return [
       'create' => [
@@ -77,6 +81,10 @@ class PrepareDirectoryTaskTest extends TaskTestBase {
 
   /**
    * @dataProvider casesRun
+   *
+   * @phpstan-param array<string, mixed> $expected
+   * @phpstan-param array<string, mixed> $vfsStructure
+   * @phpstan-param array<string, mixed> $options
    */
   public function testRun(array $expected, array $vfsStructure, array $options): void {
     $vfsRootDirName = $this->getName(FALSE) . '.' . $this->dataName();

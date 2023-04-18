@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Integration;
 
@@ -8,7 +8,8 @@ namespace Drupal\Tests\marvin\Integration;
  * @group marvin
  * @group drush-command
  *
- * @covers \Drush\Commands\marvin\DrushConfigCommands<extended>
+ * @covers \Drush\Commands\marvin\DrushConfigCommands
+ * @covers \Drush\Commands\marvin\CommandsBase
  * @covers \Drupal\marvin\CommandDelegatorTrait
  */
 class DrushConfigCommandsTest extends UnishIntegrationTestCase {
@@ -31,8 +32,8 @@ class DrushConfigCommandsTest extends UnishIntegrationTestCase {
     $topLevelKeys = [
       'drush',
       'marvin',
-      'env',
       'options',
+      'env',
       'runtime',
     ];
 

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\Commands;
 
@@ -11,7 +11,8 @@ use Robo\Config\Config;
  * @group marvin
  * @group drush-command
  *
- * @covers \Drush\Commands\marvin\StatusReportCommands<extended>
+ * @covers \Drush\Commands\marvin\StatusReportCommands
+ * @covers \Drush\Commands\marvin\CommandsBase
  */
 class StatusReportCommandsTest extends CommandsTestBase {
 

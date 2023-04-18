@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\Robo\Task;
 
 use Drupal\marvin\ComposerInfo;
-use Sweetchuck\Utils\Filter\ArrayFilterFileSystemExists;
+use Sweetchuck\Utils\Filter\FileSystemExistsFilter;
 use Symfony\Component\Finder\Finder;
 
 class ArtifactCollectFilesTask extends BaseTask {
@@ -48,6 +48,9 @@ class ArtifactCollectFilesTask extends BaseTask {
     return $this;
   }
 
+  /**
+   * @phpstan-param marvin-robo-task-artifact-collect-files-options $options
+   */
   public function setOptions(array $options): static {
     parent::setOptions($options);
 
@@ -177,8 +180,8 @@ class ArtifactCollectFilesTask extends BaseTask {
               "$docroot/favicon.ico",
               "$docroot/robots.txt",
             ],
-            (new ArrayFilterFileSystemExists())->setBaseDir($packagePath)
-          )
+            (new FileSystemExistsFilter())->setBaseDir($packagePath),
+          ),
         );
         break;
 

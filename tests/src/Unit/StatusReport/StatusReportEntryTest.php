@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit\StatusReport;
 
@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @group marvin
  *
- * @covers \Drupal\marvin\StatusReport\StatusReportEntry<extended>
+ * @covers \Drupal\marvin\StatusReport\StatusReportEntry
  */
 class StatusReportEntryTest extends TestCase {
 

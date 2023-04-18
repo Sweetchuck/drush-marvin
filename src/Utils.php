@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin;
 
@@ -9,15 +9,14 @@ use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
 use Drupal\marvin\StatusReport\StatusReportInterface;
 use League\Container\Container as LeagueContainer;
 use Psr\Container\ContainerInterface;
-use Stringy\StaticStringy;
-use Stringy\Stringy;
 use Sweetchuck\Utils\VersionNumber;
 use Symfony\Component\Console\Helper\Table as ConsoleTable;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\String\UnicodeString;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @todo Make a service out of this class.
@@ -49,6 +48,9 @@ class Utils {
     'theme' => TRUE,
   ];
 
+  /**
+   * @phpstan-param array<string, class-string> $lintServices
+   */
   public static function initLintReporters(array $lintServices, ContainerInterface $container): void {
     foreach ($lintServices as $id => $class) {
       Utils::addDefinitionsToContainer(
@@ -63,6 +65,9 @@ class Utils {
     }
   }
 
+  /**
+   * @phpstan-param iterable<string|array<string, mixed>> $definitions
+   */
   public static function addDefinitionsToContainer(iterable $definitions, ContainerInterface $container): void {
     foreach ($definitions as $alias => $definition) {
       if ($container->has($alias)) {
@@ -94,10 +99,18 @@ class Utils {
     return Path::getDirectory(__DIR__);
   }
 
+  /**
+   * @return string[]
+   */
   public static function drupalPhpExtensionPatterns(): array {
     return static::prefixSuffixItems(array_keys(static::$drupalPhpExtensions, TRUE), '*.');
   }
 
+  /**
+   * @phpstan-param iterable<string> $items
+   *
+   * @return string[]
+   */
   public static function prefixSuffixItems(iterable $items, string $prefix = '', string $suffix = ''): array {
     $result = [];
 
@@ -108,27 +121,19 @@ class Utils {
     return $result;
   }
 
-  public static function commandClassNameToConfigIdentifier(string $className): string {
-    return (string) (new Stringy($className))
-      ->regexReplace('^\\\\?Drush\\\\Commands\\\\', '')
-      ->regexReplace('(Commands|CommandsBase)$', '')
-      ->regexReplace('^marvin([^\\\\]*)', '')
-      ->replace('\\', '.')
-      ->dasherize()
-      ->regexReplace('(?<=\.)(([^\.]+)\.(\2[_-]))(?=[^\.]+$)', '\2.');
-  }
-
   /**
    * Checks that a composer package is Drupal related or not.
    *
-   * @param array $package
+   * @phpstan-param marvin-composer-info $package
    *   Composer package definition.
    *
    * @return bool
-   *   Return TRUE if the $package is Drupal related.
+   *   Returns TRUE if the $package is Drupal related.
    */
   public static function isDrupalPackage(array $package): bool {
-    return !empty(static::$drupalPackageTypes[$package['type']]);
+    $type = $package['type'] ?? 'library';
+
+    return !empty(static::$drupalPackageTypes[$type]);
   }
 
   public static function getComposerJsonFileName(): string {
@@ -138,7 +143,7 @@ class Utils {
   /**
    * @deprecated
    *
-   * @see \Sweetchuck\Utils\Filesystem::findFileUpward
+   * @see \Sweetchuck\Utils\FileSystemUtils::findFileUpward
    */
   public static function findFileUpward(string $fileName, string $absoluteDirectory = ''): string {
     if (!$absoluteDirectory) {
@@ -161,6 +166,9 @@ class Utils {
     return '';
   }
 
+  /**
+   * @return string[]
+   */
   public static function getDirectDescendantDrupalPhpFiles(string $dir): array {
     $extensions = [];
     foreach (array_keys(static::$drupalPhpExtensions, TRUE) as $extension) {
@@ -206,6 +214,12 @@ class Utils {
     return (bool) preg_match(static::getDrupalExtensionVersionNumberPattern(), $versionNumber);
   }
 
+  /**
+   * @param string $versionNumber
+   *   Example: "8.x-1.2".
+   *
+   * @phpstan-return marvin-drupal-extension-version-number
+   */
   public static function parseDrupalExtensionVersionNumber(string $versionNumber): array {
     $pattern = static::getDrupalExtensionVersionNumberPattern();
     $matches = [];
@@ -230,6 +244,7 @@ class Utils {
     settype($matches['extensionMinor'], 'int');
     settype($matches['extensionPreMajor'], 'int');
 
+    /* @phpstan-ignore-next-line */
     return array_intersect_key($matches, $default);
   }
 
@@ -257,7 +272,7 @@ class Utils {
   }
 
   /**
-   * @todo Deprecated. Use Stringy.
+   * @todo Deprecated.
    */
   public static function ensureTrailingEol(string &$text): void {
     if (!preg_match('/[\r\n]$/u', $text)) {
@@ -269,7 +284,11 @@ class Utils {
    * @todo Probably this method is not necessary any more.
    */
   public static function phpUnitSuiteNameToNamespace(string $suitName): string {
-    return StaticStringy::upperCamelize($suitName);
+    return ucfirst(
+      (new UnicodeString($suitName))
+        ->camel()
+        ->toString()
+    );
   }
 
   /**
@@ -290,6 +309,9 @@ class Utils {
     return NULL;
   }
 
+  /**
+   * @phpstan-param \Drupal\marvin\StatusReport\StatusReportInterface<string, \Drupal\marvin\StatusReport\StatusReportEntryInterface> $statusReport
+   */
   public static function convertStatusReportToRowsOfFields(StatusReportInterface $statusReport): RowsOfFields {
     $data = $statusReport->jsonSerialize();
     $severityNames = RfcLogLevel::getLevels();
@@ -305,18 +327,14 @@ class Utils {
   }
 
   public static function formatTextBySeverity(int $severity, string $text): string {
-    switch ($severity) {
-      case RfcLogLevel::EMERGENCY:
-      case RfcLogLevel::ALERT:
-      case RfcLogLevel::CRITICAL:
-      case RfcLogLevel::ERROR:
-        return "<fg=red>$text</>";
-
-      case RfcLogLevel::WARNING:
-        return "<fg=yellow>$text</>";
-    }
-
-    return $text;
+    return match ($severity) {
+      RfcLogLevel::EMERGENCY,
+      RfcLogLevel::ALERT,
+      RfcLogLevel::CRITICAL,
+      RfcLogLevel::ERROR => "<fg=red>$text</>",
+      RfcLogLevel::WARNING => "<fg=yellow>$text</>",
+      default => $text,
+    };
   }
 
   /**
@@ -345,6 +363,9 @@ class Utils {
     ];
   }
 
+  /**
+   * @phpstan-return marvin-composer-package-name-parts
+   */
   public static function splitPackageName(string $packageName): array {
     $parts = explode('/', $packageName, 2);
     if (count($parts) === 1) {
@@ -359,6 +380,7 @@ class Utils {
 
   /**
    * @todo Do something on empty input.
+   * @todo This also can be done by \Sweetchuck\Utils\VersionNumber.
    */
   public static function phpVersionToPhpVersionId(string $phpVersion): string {
     if (mb_strpos($phpVersion, '.') === FALSE) {
@@ -378,14 +400,13 @@ class Utils {
 
   public static function phpErrorAll(string $phpVersion): int {
     $phpVersionMajorMinor = mb_substr(static::phpVersionToPhpVersionId($phpVersion), 0, 4);
-    switch ($phpVersionMajorMinor) {
-      case '0701':
-      case '0702':
-      case '0703':
-        return 32767;
-    }
 
-    return E_ALL;
+    return match ($phpVersionMajorMinor) {
+      '0701',
+      '0702',
+      '0703' => 32767,
+      default => E_ALL,
+    };
   }
 
   /**
@@ -405,6 +426,9 @@ class Utils {
     return $command . $phpVariant['command']['executable'];
   }
 
+  /**
+   * @phpstan-param marvin-db-connection $connection
+   */
   public static function dbUrl(array $connection): string {
     if ($connection['driver'] === 'sqlite') {
       return 'sqlite://' . $connection['database'];
@@ -473,6 +497,9 @@ class Utils {
     return $version;
   }
 
+  /**
+   * @phpstan-return null|marvin-semversion-pre-release
+   */
   public static function parseSemVersionPreRelease(string $preRelease): ?array {
     $pattern = '/^(?P<type>(alpha|beta|rc)\.?)(?P<number>\d+)$/ui';
     $matches = [];
@@ -485,6 +512,12 @@ class Utils {
       : NULL;
   }
 
+  /**
+   * @param string[] $dirs
+   * @param string[] $files
+   *
+   * @phpstan-return null|marvin-first-file
+   */
   public static function pickFirstFile(array $dirs, array $files): ?array {
     foreach ($dirs as $dir) {
       foreach ($files as $file) {
@@ -508,17 +541,29 @@ class Utils {
     return $state ? "--$optionName" : "--no-$optionName";
   }
 
+  /**
+   * @phpstan-param null|marvin-rfc-log-level $severity
+   * @phpstan-param marvin-rfc-log-level $lowestError
+   *
+   * @phpstan-return int<0, 8>
+   */
   public static function getExitCodeBasedOnSeverity(?int $severity, int $lowestError = RfcLogLevel::ERROR): int {
     return $severity === NULL || $severity > $lowestError ? 0 : $severity + 1;
   }
 
+  /**
+   * @return string[]
+   */
   public static function explodeCommaSeparatedList(string $items): array {
     return array_filter(
-      preg_split('/\s*,\s*/', trim($items)),
-      'mb_strlen'
+      preg_split('/\s*,\s*/', trim($items)) ?: [],
+      'mb_strlen',
     );
   }
 
+  /**
+   * @phpstan-param iterable<string, marvin-task-definition> $taskDefinitions
+   */
   public static function taskDefinitionsAsTable(iterable $taskDefinitions, OutputInterface $output): ConsoleTable {
     $table = new ConsoleTable($output);
     $table->setHeaders([
@@ -531,7 +576,7 @@ class Utils {
       $table->addRow([
         'weight' => new TableCell(
           (string) ($taskDefinition['weight'] ?? 0),
-          []
+          [],
         ),
         'provider' => $taskDefinition['provider'] ?? '',
         'id' => $id,
@@ -542,7 +587,7 @@ class Utils {
     return $table;
   }
 
-  public static function callableToString($callable): string {
+  public static function callableToString(callable $callable): string {
     if (is_string($callable)) {
       return $callable;
     }
@@ -557,6 +602,7 @@ class Utils {
       return get_class($callable) . '::__invoke';
     }
 
+    // @todo \Closure or something is wrong.
     return '';
   }
 
@@ -576,18 +622,39 @@ class Utils {
   public static function fileGetContents(string $fileName): string {
     $content = file_get_contents($fileName);
     if ($content === FALSE) {
-      throw new \Exception('@todo');
+      throw new \Exception("$fileName could not be open");
     }
 
     return $content;
   }
 
+  /**
+   * @phpstan-param null|int<1, max> $length
+   */
   public static function generateHashSalt(?int $length = NULL): string {
     if ($length === NULL) {
       $length = random_int(32, 64);
     }
 
     return bin2hex(random_bytes($length));
+  }
+
+  /**
+   * @phpstan-return array<string, string>
+   */
+  public static function stringVariants(string $string, string $prefix): array {
+    return [
+      "{$prefix}Snake" => (new UnicodeString($string))
+        ->snake()
+        ->toString(),
+      "{$prefix}UpperCamel" => (new UnicodeString("a_$string"))
+        ->camel()
+        ->trimPrefix('a')
+        ->toString(),
+      "{$prefix}LowerCamel" => (new UnicodeString($string))
+        ->camel()
+        ->toString(),
+    ];
   }
 
 }

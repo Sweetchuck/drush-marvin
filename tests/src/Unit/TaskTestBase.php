@@ -1,40 +1,30 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\marvin\Unit;
 
+use Drupal\marvin\Utils;
 use Drupal\Tests\marvin\Helper\DummyOutput;
 use Drupal\Tests\marvin\Helper\TaskBuilder;
 use Drush\Config\DrushConfig;
 use Drush\Drush;
 use League\Container\Container as LeagueContainer;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Robo\Collection\CollectionBuilder;
 use Robo\Robo;
 use Symfony\Component\Console\Application as SymfonyApplication;
 
 class TaskTestBase extends TestCase {
 
-  /**
-   * @var \Psr\Container\ContainerInterface
-   */
-  protected $container;
+  protected ContainerInterface $container;
 
-  /**
-   * @var \Drush\Config\DrushConfig
-   */
-  protected $config;
+  protected DrushConfig $config;
 
-  /**
-   * @var \Robo\Collection\CollectionBuilder
-   */
-  protected $builder;
+  protected CollectionBuilder $builder;
 
-  /**
-   * @var \Drupal\Tests\marvin\Helper\TaskBuilder
-   */
-  protected $taskBuilder;
+  protected TaskBuilder $taskBuilder;
 
   /**
    * {@inheritdoc}
@@ -58,13 +48,18 @@ class TaskTestBase extends TestCase {
     Robo::configureContainer($this->container, $application, $this->config, $input, $output);
     Drush::setContainer($this->container);
 
+    /** @phpstan-ignore-next-line */
     $this->builder = CollectionBuilder::create($this->container, NULL);
     $this->taskBuilder = new TaskBuilder();
     $this->taskBuilder->setContainer($this->container);
     $this->taskBuilder->setBuilder($this->builder);
   }
 
-  public static function assertRoboTaskLogEntries(array $expected, array $actual) {
+  /**
+   * @phpstan-param mixed[] $expected
+   * @phpstan-param mixed[] $actual
+   */
+  public static function assertRoboTaskLogEntries(array $expected, array $actual): void {
     static::assertSameSize($expected, $actual, 'Number of log messages');
 
     foreach ($actual as $key => $log) {

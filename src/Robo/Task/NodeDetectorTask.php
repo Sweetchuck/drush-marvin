@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\marvin\Robo\Task;
 
@@ -39,6 +39,9 @@ class NodeDetectorTask extends BaseTask implements BuilderAwareInterface {
     return $this;
   }
 
+  /**
+   * @phpstan-param marvin-robo-task-node-detector-options $options
+   */
   public function setOptions(array $options): static {
     parent::setOptions($options);
 
