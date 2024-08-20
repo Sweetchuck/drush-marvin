@@ -21,6 +21,8 @@ use Consolidation\AnnotatedCommand\Parser\CommandInfo;
  *   ],
  * )]
  * ```
+ *
+ * @see \Drush\Commands\marvin\MarvinCommands::onHookValidateMarvinArrayLength
  */
 #[\Attribute(\Attribute::TARGET_METHOD)]
 class ValidateArrayLength {

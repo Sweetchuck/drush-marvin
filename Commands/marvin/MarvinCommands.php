@@ -35,14 +35,14 @@ class MarvinCommands extends CommandsBase {
       : $commandData->input()->getArgument($inputName);
 
     $errorMsgPrefix = sprintf(
-      "%s %s",
+      '%s %s',
       $inputType,
       $inputType === 'option' ? "--$inputName" : $inputName,
     );
     $numOfItems = count($value);
     if ($constraint['required'] && !$numOfItems) {
       return new CommandError(
-        sprintf("%s: is required.", $errorMsgPrefix),
+        sprintf('%s: is required.', $errorMsgPrefix),
         1,
       );
     }
@@ -50,7 +50,7 @@ class MarvinCommands extends CommandsBase {
     if ($constraint['min'] !== NULL && $numOfItems < $constraint['min']) {
       return new CommandError(
         sprintf(
-          "%s: Minimum number of items: %d; Current number of items: %d",
+          '%s: Minimum number of items: %d; Current number of items: %d',
           $errorMsgPrefix,
           $constraint['min'],
           $numOfItems,
@@ -62,7 +62,7 @@ class MarvinCommands extends CommandsBase {
     if ($constraint['max'] !== NULL && $numOfItems > $constraint['max']) {
       return new CommandError(
         sprintf(
-          "%s: Maximum number of items: %d; Current number of items: %d",
+          '%s: Maximum number of items: %d; Current number of items: %d',
           $errorMsgPrefix,
           $constraint['max'],
           $numOfItems,

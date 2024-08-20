@@ -5,6 +5,7 @@
     "license": "GPL-2.0-or-later",
     "keywords": [
         "drupal",
+        "drupal-11",
         "drush",
         "marvin"
     ],
@@ -26,21 +27,21 @@
         "sort-packages": true
     },
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.3",
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-pcre": "*",
         "composer/composer": "^2.4",
-        "consolidation/robo": "^4.0",
+        "consolidation/robo": "^5.0",
         "sweetchuck/drupal-drush-helper": "1.x-dev",
         "sweetchuck/git-hooks-stdinput-reader": "1.x-dev",
         "sweetchuck/lint-report": "1.x-dev",
-        "sweetchuck/robo-git": "3.x-dev",
-        "sweetchuck/robo-nvm": "3.x-dev",
-        "sweetchuck/robo-yarn": "3.x-dev",
+        "sweetchuck/robo-git": "4.x-dev",
+        "sweetchuck/robo-nvm": "4.x-dev",
+        "sweetchuck/robo-yarn": "4.x-dev",
         "sweetchuck/utils": "2.x-dev",
-        "symfony/filesystem": "^5.0 || ^6.0",
-        "symfony/string": "^6.3"
+        "symfony/filesystem": "^6.0 || ^7.0",
+        "symfony/string": "^6.3 || ^7.0"
     },
     "require-dev": {
         "ext-dom": "*",
@@ -49,7 +50,7 @@
         "weitzman/drupal-test-traits": "^2.1"
     },
     "suggest": {
-        "drush/drush": "^12.0"
+        "drush/drush": "^13.0"
     },
     "autoload": {
         "psr-4": {
